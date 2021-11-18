@@ -81,6 +81,20 @@
   }
 }
 
+.passwordWrapper {
+  position: relative;
+  display: flex;
+}
+
+.passwordIcon {
+  position: absolute;
+  top: 35%;
+  right: 8%;
+
+  border: none;
+  background: none;
+}
+
 .btnContainer {
   display: flex;
   gap: 10%;

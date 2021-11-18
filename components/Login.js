@@ -3,6 +3,24 @@ import { useRouter } from 'next/router';
 import Styles from './Login.module.scss';
 import Image from 'next/image';
 
+async function createUser(email, password) {
+  const response = await fetch('https://reqres.in/api/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data = await response.json();
+
+  if (data.error) {
+    alert(data.error);
+  }
+
+  return data;
+}
+
 export default function Login() {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -10,6 +28,18 @@ export default function Login() {
   const router = useRouter();
 
   const [isLogin, setIsLogin] = useState(true);
+  const [values, setValues] = useState({
+    password: '',
+    showPassword: false,
+  });
+
+  const handleClickShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+  };
+
+  const handlePasswordChange = (props) => (event) => {
+    setValues({ ...values, [props]: event.target.value });
+  };
 
   async function submitHandler(event) {
     event.preventDefault();
@@ -32,8 +62,13 @@ export default function Login() {
       if (!data.error) {
         router.replace('/friends');
       }
-
-      return data;
+    } else {
+      try {
+        const result = await createUser(email, password);
+        console.log(result);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -78,28 +113,38 @@ export default function Login() {
           )}
 
           <form onSubmit={submitHandler} className={Styles.cardForm}>
-            {!isLogin && (
+            {/* {!isLogin && (
               <div>
                 <input type='text' name='' id='name' placeholder='Name' />
               </div>
-            )}
+            )} */}
             <div>
               <input
                 type='text'
-                name=''
+                name='email'
                 id='email'
                 placeholder='Email'
                 ref={emailInputRef}
               />
             </div>
-            <div>
+            <div className={Styles.passwordWrapper}>
               <input
-                type='text'
-                name=''
+                type={values.showPassword ? 'text' : 'password'}
+                value={values.password}
+                onChange={handlePasswordChange('password')}
                 id='password'
                 placeholder='Password'
                 ref={passwordInputRef}
               />
+              <button
+                onClick={handleClickShowPassword}
+                className={Styles.passwordIcon}>
+                {values.showPassword ? (
+                  <ion-icon name='eye-outline'></ion-icon>
+                ) : (
+                  <ion-icon name='eye-off-outline'></ion-icon>
+                )}
+              </button>
             </div>
 
             <div className={Styles.btnContainer}>
